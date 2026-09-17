@@ -10,7 +10,7 @@ Installation
 
   1. Clone the repository
 
-          git clone https://github.com/PHLAK/ollama-compose.git
+          git clone https://github.com/PHLAK/open-webui-compose.git
 
   2. Initialize the configuration files
 

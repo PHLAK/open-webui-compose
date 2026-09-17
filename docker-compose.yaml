@@ -1,25 +1,9 @@
 services:
 
-  ollama:
-    image: ollama/ollama:${OLLAMA_VERSION:-latest}
-    extends:
-      file: hardware-acceleration.yaml
-      service: ${HARDWARE_ACCELERATION:-cpu}
-    env_file: environment.d/ollama.env
-    ports:
-      - ${OLLAMA_PORT:-127.0.0.1:11434}:11434
-    volumes:
-      - ${OLLAMA_DATA_VOLUME:-ollama-data}:/root/.ollama
-      - /etc/localtime:/etc/localtime:ro
-    labels:
-      com.centurylinklabs.watchtower.scope: ${COMPOSE_PROJECT_NAME}
-    restart: unless-stopped
-
   open-webui:
     image: ghcr.io/open-webui/open-webui:${OPEN_WEBUI_VERSION:-main}
     env_file: environment.d/open-webui.env
     environment:
-      OLLAMA_BASE_URL: http://ollama:11434
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
     ports:
       - ${OPEN_WEBUI_PORT:-8080}:8080
@@ -43,5 +27,4 @@ services:
     restart: unless-stopped
 
 volumes:
-   ollama-data: {}
    open-webui-data: {}
