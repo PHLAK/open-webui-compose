@@ -5,6 +5,23 @@ services:
     env_file: environment.d/open-webui.env
     environment:
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+      TERMINAL_SERVER_CONNECTIONS: >-
+        [{
+          "id": "terminals",
+          "name": "Terminals",
+          "enabled": true,
+          "url": "http://terminals:3000",
+          "key": "${TERMINALS_API_KEY}",
+          "auth_type": "bearer",
+          "server_type": "orchestrator",
+          "config": {
+            "access_grants": [{
+              "principal_type": "user",
+              "principal_id": "*",
+              "permission": "read"
+            }]
+          }
+        }]
     ports:
       - ${OPEN_WEBUI_PORT:-8080}:8080
     extra_hosts:
@@ -12,17 +29,23 @@ services:
     volumes:
       - ${OPEN_WEBUI_DATA_VOLUME:-open-webui-data}:/app/backend/data
       - /etc/localtime:/etc/localtime:ro
+    depends_on: [terminals]
     labels:
       com.centurylinklabs.watchtower.scope: ${COMPOSE_PROJECT_NAME}
     restart: unless-stopped
 
-  open-terminal:
-    image: ghcr.io/open-webui/open-terminal:${OPEN_TERMINAL_VERSION:-latest}
-    env_file: environment.d/open-terminal.env
+  terminals:
+    image: ghcr.io/open-webui/terminals:${TERMINALS_VERSION:-latest}
+    env_file: environment.d/terminals.env
     environment:
-      OPEN_TERMINAL_API_KEY: ${OPEN_TERMINAL_API_KEY}
+      TERMINALS_BACKEND: docker
+      TERMINALS_API_KEY: ${TERMINALS_API_KEY}
+      TERMINALS_ENABLE_UI: false
+      TERMINALS_DOCKER_NETWORK: ${COMPOSE_PROJECT_NAME}_default
+      TERMINALS_DOCKER_HOST_DATA_DIR: ${TERMINALS_DATA_VOLUME:?An absolute host path is required}/terminals
     volumes:
-      - ${OPEN_TERMINAL_DATA_VOLUME:-open-terminal-data}:/home/user
+      - ${TERMINALS_DATA_VOLUME:?An absolute host path is required}:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
     labels:
       com.centurylinklabs.watchtower.scope: ${COMPOSE_PROJECT_NAME}
@@ -42,4 +65,3 @@ services:
 
 volumes:
    open-webui-data: {}
-   open-terminal-data: {}
