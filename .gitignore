@@ -1,2 +1,19 @@
+# --------------------------------------
+# Application configuration files
+# --------------------------------------
+
 /environment.d/*
 /.env
+
+# --------------------------------------
+# User-generated files
+# --------------------------------------
+
+/docker-compose.override.yml
+/docker-compose.override.yaml
+
+# --------------------------------------
+# Miscellaneous
+# --------------------------------------
+
+!.gitkeep
